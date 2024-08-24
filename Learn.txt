@@ -256,3 +256,5 @@ add following in main.scss
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+//nuxt basic setup ends here
