@@ -218,7 +218,7 @@ export default defineNuxtConfig({
   alias:{
     "@":resolve(__dirname,"/")
   },
-  css:["~/assets/main.scss"]
+  css:["~/assets/main.scss"]//scss load gareko app ma
 })
 
 //in main.scss
@@ -228,3 +228,31 @@ body{
 
 now to use scss, saas, we need to install saas
 $ npm install -D sass or yarn add -D sass
+
+Install Tailwindcss: https://tailwindcss.com/docs/guides/nuxtjs#standard
+$ npm install -D tailwindcss postcss autoprefixer
+$ npx tailwindcss init
+
+add following in nuxt.config.ts
+  postcss: {
+    plugins: {
+      tailwindcss: {},
+      autoprefixer: {},
+    },
+  },
+
+add following in  tailwind.config.JavaScript
+  content: [
+    "./components/**/*.{js,vue,ts}", //nuxt ko components folder watch gareko
+    "./layouts/**/*.vue",
+    "./pages/**/*.vue",
+    "./plugins/**/*.{js,ts}",
+    "./app.vue",//nuxt ko app.vue files watch gareko
+    "./error.vue",
+  ],
+
+
+add following in main.scss
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
