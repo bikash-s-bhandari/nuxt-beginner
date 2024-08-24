@@ -1,0 +1,230 @@
+1. Installation
+https://nuxt.com/docs/getting-started/installation
+$ npx nuxi@latest init <project-name>
+
+by default folllowing files and folder are avaibalbe
+a .nuxt folder
+b. public folder
+c. server folder
+d. app.vue //main app page
+
+when our project start, we see content from app.vue
+//in app.vue //see https://nuxt.com/docs/getting-started/views
+<template>
+  <div>
+    <NuxtRouteAnnouncer />//The <NuxtRouteAnnouncer> component adds a hidden element with the page title to announce route changes to assistive technologies.
+    <NuxtWelcome /> //this is welcome component from nuxt
+  </div>
+</template>
+
+see: https://nuxt.com/docs/api/components/nuxt-route-announcer
+
+2.Pages  
+->Create a pages folder, everything inside it works a routes
+//pages/index.vue
+
+NOTE: 
+->by default nuxt ma app.vue ko content show hunxa in url http://localhost:3000, 
+->but if we want to show our won page from pages/index.vue in url http://localhost:300, then delete app.vue 
+
+pages vitra about.vue,contact.vue page create garne but when we hit http://localhost:3000/about, http://localhost:3000/contact page will not render becoz we need to add  <NuxtPage /> in our main app.vue
+
+//app.vue
+
+<template>
+<div>
+    <NuxtPage /> //yesle pages vitra ko route haru show garxa
+</div>
+</template>
+
+<script setup></script>
+
+//pages
+->index.vue //url: http://localhost:3000
+->about.vue //http://localhost:3000/about
+->contact.vue //http://localhost:3000/contact
+
+
+3.Layouts:
+->Layouts are wrappers around pages that contain a common User Interface for several pages, such as a header and footer display. 
+->Layouts are Vue files using <slot /> components to display the page content. 
+->The layouts/default.vue file will be used by default. Custom layouts can be set as part of your page metadata.
+
+Create layouts/default.vue file
+//layouts/default.vue
+<template>
+    <div>
+      <AppHeader /> //this is header component
+      <slot />
+      <AppFooter /> //footer component
+    </div>
+  </template>
+
+  Now wrapp  <NuxtPage /> with <NuxtLayout> in app.vue
+  //app.vue
+<template>
+<div>
+    <NuxtLayout>
+    <NuxtPage /> //now pages vitra ko harek route ma yo layout apply hunxa
+    </NuxtLayout>
+</div>
+</template>
+
+<script setup></script>
+
+NOTE:  <NuxtLayout> le by default layouts/default.vue ma vako layout linxa, if we want to create custom layout then create "custom.vue"
+//in layouts/custom.vue
+<template>
+  <div>
+    <CustomAppHeader/>
+    <slot />
+    <CustomAppFooter/>
+  </div>
+</template>
+
+<script lang="ts" setup>
+
+</script>
+
+<style>
+
+</style>
+
+Now lets apply this custom layout in about page
+
+//pages/about.vue
+<template>
+  <div>about page</div>
+</template>
+
+<script setup lang="ts">
+definePageMeta({
+  layout: "custom", //this will apply custom layout instead of default.vue
+});
+</script>
+
+<style></style>
+
+NOTE: we can directly override default layout for all pages
+//app.vue
+<script setup lang="ts">
+// You might choose this based on an API call or logged-in status
+const layout = "custom";
+</script>
+
+<template>
+  <NuxtLayout :name="layout">
+    <NuxtPage />
+  </NuxtLayout>
+</template>
+
+
+->If you have a layout in nested directories, the layout's name will be based on its own path directory and filename, with duplicate segments being removed.
+File	Layout Name
+~/layouts/desktop/default.vue	     desktop-default
+~/layouts/desktop-base/base.vue	   desktop-base
+~/layouts/desktop/index.vue	       desktop
+For clarity, we recommend that the layout's filename matches its name:
+File	Layout Name
+~/layouts/desktop/DesktopDefault.vue	desktop-default
+~/layouts/desktop-base/DesktopBase.vue	desktop-base
+~/layouts/desktop/Desktop.vue	desktop
+
+
+4.components directory:
+->Nuxt automatically imports any components in this directory (along with components that are registered by any modules you may be using).
+
+components/
+--| AppHeader.vue
+--| AppFooter.vue
+//app.vue
+<template>
+  <div>
+    <AppHeader />//components directory bata automatic import hunxa
+    <NuxtPage />
+    <AppFooter />
+  </div>
+</template>
+
+
+For Nested Components directory
+
+components/
+--| base/
+----| Button.vue
+
+->means components folder vitra base sub folder vitra Button.vue file xa vane its name will be "BaseButton"
+
+//in aboout.vue
+<template>
+  <div>about page</div>
+  <div>
+  <BaseButton/>//nested folder vitra vako component yesari use garne
+
+  </div>
+</template>
+
+
+
+4. assets directory
+->The directory usually contains the following types of files:
+a.Stylesheets (CSS, SASS, etc.)
+b.Fonts
+c. Images that won't be served from the public/ directory.
+
+
+
+
+->Nuxt uses two directories to handle assets like stylesheets, fonts or images.
+a.The public/ directory content is served at the server root as-is.
+b.The assets/ directory contains by convention every asset that you want the build tool (Vite or webpack) to process.
+
+Public Directory
+The public/ directory is used as a public server for static assets publicly available at a defined URL of your application.
+
+You can get a file in the public/ directory from your application's code or from a browser by the root URL /.
+For example, referencing an image file in the public/img/ directory, available at the static URL /img/nuxt.png:
+
+<template>
+  <img src="/img/nuxt.png" alt="Discover Nuxt 3" />
+</template>
+
+Assets Directory:
+
+->Nuxt uses Vite (default) or webpack to build and bundle your application. The main function of these build tools is to process JavaScript files, but they can be extended through plugins (for Vite) or loaders (for webpack) to process other kind of assets, like stylesheets, fonts or SVG. This step transforms the original file mainly for performance or caching purposes (such as stylesheets minification or browser cache invalidation).
+By convention, Nuxt uses the assets/ directory to store these files but there is no auto-scan functionality for this directory, and you can use any other name for it.
+
+In your application's code, you can reference a file located in the assets/ directory by using the ~/assets/ path.
+
+<template>
+  <img src="~/assets/img/nuxt.png" alt="Discover Nuxt 3" />
+</template>
+
+
+Global Styles Imports
+->To globally insert statements in your Nuxt components styles, you can use the Vite option at your nuxt.config file.
+
+
+
+->create main.scss file in assets folder
+
+//nuxt.config.ts
+
+import {resolve} from 'path'
+
+export default defineNuxtConfig({
+  compatibilityDate: '2024-04-03',
+  devtools: { enabled: true },
+  alias:{
+    "@":resolve(__dirname,"/")
+  },
+  css:["~/assets/main.scss"]
+})
+
+//in main.scss
+body{
+  background:pink;
+}
+
+now to use scss, saas, we need to install saas
+$ npm install -D sass or yarn add -D sass
