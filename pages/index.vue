@@ -1,11 +1,15 @@
 <template>
+  <div class="main">
+   this is home page {{greet}}
+  </div>
   <div>
-   this is home page
+    <Counter/>
   </div>
 </template>
 
 <script lang="ts" setup>
-
+const { $hello } = useNuxtApp() //from nuxt plugin
+const greet = $hello('World')
 </script>
 
 <style>

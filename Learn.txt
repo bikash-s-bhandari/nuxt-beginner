@@ -208,14 +208,19 @@ For example, referencing an image file in the public/img/ directory, available a
 
 Assets Directory:
 
-->Nuxt uses Vite (default) or webpack to build and bundle your application. The main function of these build tools is to process JavaScript files, but they can be extended through plugins (for Vite) or loaders (for webpack) to process other kind of assets, like stylesheets, fonts or SVG. This step transforms the original file mainly for performance or caching purposes (such as stylesheets minification or browser cache invalidation).
-By convention, Nuxt uses the assets/ directory to store these files but there is no auto-scan functionality for this directory, and you can use any other name for it.
+->Nuxt uses Vite (default) or webpack to build and bundle your application. 
+->The main function of these build tools is to process JavaScript files, but they can be extended through plugins (for Vite) or loaders (for webpack) to process other kind of assets, like stylesheets, fonts or SVG. This step transforms the original file mainly for performance or caching purposes (such as stylesheets minification or browser cache invalidation).
+->By convention, Nuxt uses the assets/ directory to store these files but there is no auto-scan functionality for this directory, and you can use any other name for it.
 
 In your application's code, you can reference a file located in the assets/ directory by using the ~/assets/ path.
 
 <template>
   <img src="~/assets/img/nuxt.png" alt="Discover Nuxt 3" />
 </template>
+
+Conslusion: assets directory le performance ramro hunxa,
+->public directiory ko image cache hudena
+->public directory ko file direct url bata access hunxa .ie http://localhost:3000/images/profile.jpeg browser ma dekhinxa which can be insecure
 
 
 Global Styles Imports
@@ -273,3 +278,118 @@ add following in main.scss
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+6. Use SVG icons in nuxt
+https://www.npmjs.com/package/vite-svg-loader
+we need vite-svg-loader to load svg icons
+
+try to use icons component for faster load 
+go to https://icones.js.org/
+copy any icons eg bell
+
+create icons/Bell.vue
+//Bell.vue
+
+<template>
+  <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M12 18.5q.625 0 1.063-.437T13.5 17h-3q0 .625.438 1.063T12 18.5M7 16h10v-2h-1v-2.6q0-1.525-.788-2.787T13 7V5.5h-2V7q-1.425.35-2.212 1.613T8 11.4V14H7zm5 6q-2.075 0-3.9-.788t-3.175-2.137T2.788 15.9T2 12t.788-3.9t2.137-3.175T8.1 2.788T12 2t3.9.788t3.175 2.137T21.213 8.1T22 12t-.788 3.9t-2.137 3.175t-3.175 2.138T12 22"></path></svg>
+</template>
+
+<script>
+export default {
+  name: 'MaterialSymbolsCircleNotificationsSharp'
+}
+</script>
+
+
+now use this component anywhere as <IconsBell/>
+
+
+7.composables directory:https://nuxt.com/docs/guide/directory-structure/composables
+->a composable is a function that leverages Vue's Composition API to encapsulate and reuse stateful logic in a modular and reusable way.
+When to Use Composables
+
+a. When you want to extract and reuse stateful logic across multiple components.
+b. When your components are getting too large and you want to break down their functionality into smaller, manageable pieces.
+c. When you need to share logic between components that are not related in a component hierarchy.
+
+
+create composables/useCounter.ts
+export const useCounter = () => {
+  const count = ref(0);
+
+  function increment() {
+    count.value++;
+  }
+
+  function decrement() {
+    count.value--;
+  }
+
+  return {
+    count,
+    increment,
+    decrement,
+  };
+};
+
+now it can be use in any components
+
+//Counter.vue
+
+<template>
+<div>
+    <p>Count: {{ count }}</p>
+    <button @click="increment" type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Increment</button>
+    <button  @click="decrement" type="button" class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">Decrement</button>
+  
+  </div>
+</template>
+
+<script lang="ts" setup>
+const { count, increment, decrement } = useCounter();
+</script>
+
+<style>
+
+</style>
+
+NOTE: we have composables libray in vuejs, we can use them for faster development
+->https://vueuse.org/guide/
+
+
+8.plugins directory :https://nuxt.com/docs/guide/directory-structure/plugins
+->Nuxt automatically reads the files in the plugins/ directory and loads them at the creation of the Vue application.
+
+->plugins directory ma vako files haru initally nai read and load hunxa
+eg. 
+step1. create plugins/myPlugin.ts
+export default defineNuxtPlugin((nuxtApp) => {
+
+    console.log({nuxtApp})//NUxt app start huda yo suru mai read hunxa
+
+})
+
+step2.Step 2: Register the Plugin
+->In nuxt.config.ts, Nuxt automatically registers plugins located in the plugins directory, so no need to manually add it:
+->subdirectory ma vako plugins chai register garnu parxa
+
+eg. 
+-| plugins/
+---| foo.ts      // scanned
+---| bar/
+-----| baz.ts    // not scanned
+-----| foz.vue   // not scanned
+-----| index.ts  // currently scanned but deprecated
+
+To add plugins in subdirectories, you can use the plugins option in nuxt.config.ts:
+//nuxt.config.ts
+export default defineNuxtConfig({
+  plugins: [
+    '~/plugins/bar/baz',
+    '~/plugins/bar/foz'
+  ]
+})
+
+
+9. middleware directory

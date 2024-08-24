@@ -1,0 +1,30 @@
+<template>
+  <div>
+    this is post list page
+    
+  </div>
+
+  <div>
+    <ul>
+      <li>
+        <IconsBell/>
+      <img src="/images/profile.jpeg" alt="Banner2" />
+    </li>
+    <li>
+      <img src="assets/images/banner.png" alt="Banner1" />
+    </li>
+    <li>
+      <img src="~/assets/images/banner2.png" alt="Banner2" />
+    </li>
+    </ul>
+  </div>
+</template>
+
+<script lang="ts" setup>
+import deleteIcon from './'
+
+</script>
+
+<style>
+
+</style>
