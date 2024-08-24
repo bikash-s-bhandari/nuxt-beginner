@@ -19,7 +19,7 @@ when our project start, we see content from app.vue
 
 see: https://nuxt.com/docs/api/components/nuxt-route-announcer
 
-2.Pages  
+2.pages directory (routing)
 ->Create a pages folder, everything inside it works a routes
 //pages/index.vue
 
@@ -33,7 +33,7 @@ pages vitra about.vue,contact.vue page create garne but when we hit http://local
 
 <template>
 <div>
-    <NuxtPage /> //yesle pages vitra ko route haru show garxa
+    <NuxtPage /> //yesle pages vitra ko route haru show garxa works same as  <router-view></router-view>
 </div>
 </template>
 
@@ -117,6 +117,23 @@ const layout = "custom";
     <NuxtPage />
   </NuxtLayout>
 </template>
+
+
+Nested pages
+->suppose we have pages/auth/login.vue then url will be http://localhost:3000/auth/login
+pages/post/[id].vue  //http://localhost:3000/post/1
+in [id].vue
+<template>
+  <div>
+    this is post details with id {{$route.params.id}} //id becoz page name is [id].vue, if page name is [slug].vue then {{$route.params.slug}}
+  </div>
+</template>
+
+<script lang="ts" setup>
+const route = useRoute();
+console.log(route.params.id)
+</script>
+
 
 
 ->If you have a layout in nested directories, the layout's name will be based on its own path directory and filename, with duplicate segments being removed.
