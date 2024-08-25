@@ -604,3 +604,210 @@ ref()s become state properties
 computed()s become getters
 function()s become actions
 
+
+12.server directory :: nuxt3 ma api ni banauna milxa that act as backend
+->The server/ directory is used to register API and server handlers to your application.
+->Nuxt automatically scans files inside these directories to register API and server handlers with Hot Module Replacement (HMR) support.
+
+Directory structure
+
+-| server/
+---| api/
+-----| hello.ts      # /api/hello
+---| routes/
+-----| bonjour.ts    # /bonjour
+---| middleware/
+-----| log.ts        # log all requests
+
+->Each file should export a default function defined with defineEventHandler() or eventHandler() (alias).
+->The handler can directly return JSON data, a Promise, or use event.node.res.end() to send a response.
+
+lets create post api
+create server/api/post.ts
+
+export default defineEventHandler(async (event) => {
+  return [
+    {
+      id: 1,
+      title: "His mother had always taught him",
+      body: "His mother had always taught him not to ever think of himself as better than others. He'd tried to live by this motto. He never looked down on those who were less fortunate or who had less money than him. But the stupidity of the group of people he was talking to made him change his mind.",
+      tags: ["history", "american", "crime"],
+      reactions: {
+        likes: 192,
+        dislikes: 25,
+      },
+      views: 305,
+      userId: 121,
+    },
+    {
+      id: 2,
+      title: "His mother had always taught him 2",
+      body: "His mother had always taught him not to ever think of himself as better than others. He'd tried to live by this motto. He never looked down on those who were less fortunate or who had less money than him. But the stupidity of the group of people he was talking to made him change his mind 2.",
+      tags: ["history2", "american2", "crime2"],
+      reactions: {
+        likes: 100,
+        dislikes: 30,
+      },
+      views: 300,
+      userId: 120,
+    },
+  ];
+});
+
+now call this api inside pages/posts/index.vue
+<script lang="ts" setup>
+const { data, pending, error, refresh } = await useFetch('/api/post')
+
+console.log(data.value)
+
+</script>
+
+
+Server Routes:
+->Files inside the ~/server/api are automatically prefixed with /api in their route.
+->To add server routes without /api prefix, put them into ~/server/routes directory.
+
+//server/routes/hello.ts
+export default defineEventHandler(() => 'Hello World!')
+
+
+Server Middleware:
+->Nuxt will automatically read in any file in the ~/server/middleware to create server middleware for your project.
+->Middleware handlers will run on every request before any other server route to add or check headers, log requests, or extend the event's request object.
+
+//server/middleware/auth.ts
+
+export default defineEventHandler((event) => {
+  event.context.auth = { user: 123 }
+  console.log('New request: ' + getRequestURL(event))
+})
+
+NOTE:api haru nodejs kai hunxa
+
+
+
+13.Nitro  : https://nitro.unjs.io/guide
+what is nitro in nuxt?
+->Nitro is a server engine used in Nuxt 3 that provides a powerful, universal, and flexible backend for rendering and server-side capabilities
+
+Key Features of Nitro
+a. Server-Side Rendering (SSR) and Static-Site Generation (SSG):
+
+b.API Routes:
+->Nitro supports API routes directly within the Nuxt 3 framework. 
+->You can create server-side API endpoints that run alongside your Nuxt application, eliminating the need for a separate backend server. 
+->These API routes are also fully compatible with serverless environments.
+
+c.Built-in Server Middleware:
+->Nitro allows you to define middleware that runs before rendering or handling API requests. 
+->This is useful for authentication, logging, error handling, and more.
+
+
+
+
+14. Rendering Modes
+->In Nuxt 3, there are different rendering modes that determine how your application is rendered and served to the client. 
+->The rendering modes available in Nuxt 3 are:
+
+a. Server-Side Rendering (SSR):
+->In SSR mode, the HTML is rendered on the server for every request. 
+->This improves SEO and provides a faster first contentful paint (FCP) since the server sends a fully rendered page to the client.
+->This mode is suitable for applications that require real-time data fetching and need better SEO optimization.
+
+//nuxt.config.ts
+export default defineNuxtConfig({
+  ssr: true, // Set to 'false' for SPA mode, 'true' for SSR
+  target: 'server', // Use 'static' for static generation
+})
+
+
+b.Static Site Generation (SSG):
+->Also known as "pre-rendering" or "full static," SSG allows you to generate the HTML of your pages at build time.
+->The generated static files are then served to the clients.
+->This mode is best for content-heavy websites that don’t change often, such as blogs or documentation sites. (change nahune static page haru ko lagi better hunxa)
+->It offers excellent performance and can be served from a CDN.
+
+c.Client-Side Rendering (CSR) OR  Single Page Application - SPA Mode:
+->In CSR mode, the JavaScript is loaded first, and the HTML is generated on the client side. 
+->this mode is ideal for applications where SEO is not a primary concern and you want to leverage the benefits of a JavaScript-based client-side application.
+
+export default defineNuxtConfig({
+  ssr: false, 
+
+})
+
+
+d.Hybrid Rendering (Partial Static/ISR):
+->Nuxt 3 also supports hybrid rendering, allowing you to mix and match SSR and SSG. You can statically generate some parts of your application and use SSR for others.
+
+1. Example of Server-Side Rendering (SSR) Mode
+->Server-Side Rendering (SSR) means that the Nuxt server generates the HTML of the page on each request. 
+->Configuration for SSR in nuxt.config.ts
+// nuxt.config.ts
+export default defineNuxtConfig({
+  ssr: true, // Enable SSR mode
+  target: 'server', // Ensure the target is set to 'server' for SSR
+  // Other configurations...
+})
+
+Example Page in SSR Mode
+
+<!-- pages/index.vue -->
+<template>
+  <div>
+    <h1>SSR Example Page</h1>
+    <ul>
+      <li v-for="post in posts" :key="post.id">{{ post.title }}</li>
+    </ul>
+  </div>
+</template>
+
+<script setup lang="ts">
+// Fetch data on the server-side
+const { data: posts } = await useFetch('https://jsonplaceholder.typicode.com/posts')
+</script>
+->The useFetch hook is used to fetch data from an external API.
+->Since ssr is set to true, this data fetching happens on the server for the initial request, and the fully rendered HTML is sent to the client.
+
+
+2. Example of Static Site Generation (SSG) Mode
+->also known as full static mode, generates static HTML files at build time for each route. These files are then served to clients, which can improve performance and reduce server load.
+->To enable SSG in Nuxt 3, set the ssr property to true and the target property to 'static':
+
+// nuxt.config.ts
+export default defineNuxtConfig({
+  ssr: true, // SSR must be enabled for SSG
+  target: 'static', // Enable SSG mode
+  // Other configurations...
+})
+
+Example Page in SSG Mode
+<!-- pages/index.vue -->
+<template>
+  <div>
+    <h1>SSG Example Page</h1>
+    <ul>
+      <li v-for="post in posts" :key="post.id">{{ post.title }}</li>
+    </ul>
+  </div>
+</template>
+
+<script setup lang="ts">
+// Fetch data at build time
+const { data: posts } = await useFetch('https://jsonplaceholder.typicode.com/posts')
+</script>
+
+How to Generate Static Files
+
+$ npm run build
+$ npm run generate
+
+The generate command will create a dist folder containing all the static HTML files. These can be deployed to any static hosting service (like Netlify, Vercel, or GitHub Pages).
+
+
+How to check pages is rendered SSR/SSG or not
+a. Inspecting the Network Panel (page lai inspect garera network tab ma jane)
+b. fetch/xhr ko side ma Doc lai click garne
+p. Check the document Request: page refresh garda tyo page ko url hit hunxa and response ma herne
+->If you see fully rendered HTML in the response, it indicates that the server provided a pre-rendered page. This means it could be SSR or SSG.
+

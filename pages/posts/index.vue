@@ -4,7 +4,7 @@
     
   </div>
 
-  <div>
+  <!-- <div>
     <ul>
       <li>
         <IconsBell/>
@@ -17,11 +17,24 @@
       <img src="~/assets/images/banner2.png" alt="Banner2" />
     </li>
     </ul>
+    
+  </div> -->
+  <div>
+    <h3>Post List Form API</h3>
+    <ul>
+      <li v-for="post in data">
+        <div>
+          <NuxtLink :to="`/posts/${post.id}`">{{post.title}}</NuxtLink>
+        </div>
+      </li>
+    </ul>
   </div>
 </template>
 
 <script lang="ts" setup>
-import deleteIcon from './'
+const { data, pending, error, refresh } = await useFetch('/api/post')
+
+console.log(data.value)
 
 </script>
 
