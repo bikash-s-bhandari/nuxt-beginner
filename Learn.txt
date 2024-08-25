@@ -959,3 +959,28 @@ const apiBase = config.public.apiBase;
 </script>
 
 NOTE: server side ma console gareko browser ma show hudena, u can see in terminal
+
+
+
+19.Alias: https://nuxt.com/docs/api/nuxt-config#alias
+->You can improve your DX by defining additional aliases to access custom directories within your JavaScript and CSS.
+->In Nuxt 3, aliases are shortcuts for directory paths that help you quickly reference certain folders within your project. These aliases simplify imports and references to common directories, making your code cleaner and more maintainable
+{
+  "~": "/<srcDir>",
+  "@": "/<srcDir>",
+  "~~": "/<rootDir>",
+  "@@": "/<rootDir>",
+  "assets": "/<srcDir>/assets",
+  "public": "/<srcDir>/public"
+}
+
+
+alias: {
+    'images': fileURLToPath(new URL('./assets/images', import.meta.url)),
+    'style': fileURLToPath(new URL('./assets/style', import.meta.url)),
+    'data': fileURLToPath(new URL('./assets/other/data', import.meta.url))
+  }
+
+
+
+19.Nuxt content :https://nuxt.com/docs/guide/directory-structure/content
