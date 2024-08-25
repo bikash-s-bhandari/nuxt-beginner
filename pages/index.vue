@@ -4,6 +4,7 @@
   </div>
   <div>
     <Counter/>
+    <Counter2/>
   </div>
 </template>
 

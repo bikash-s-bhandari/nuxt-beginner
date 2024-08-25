@@ -392,4 +392,215 @@ export default defineNuxtConfig({
 })
 
 
-9. middleware directory
+9. middleware directory  : https://nuxt.com/docs/guide/directory-structure/middleware
+
+->named route middleware, placed in the middleware/ and automatically loaded via asynchronous import when used on a page.
+->global route middleware, placed in the middleware/ with a .global suffix and is run on every route change.
+
+a.named route middleware
+create a file middleware/auth.ts
+//auth.ts
+export default defineNuxtRouteMiddleware((to, from) => {
+
+    console.log({from,to})
+
+})
+
+now apply this middleware to pages/contact-us.vue
+
+<script setup lang="ts">
+definePageMeta({
+  middleware: ["auth"]
+  
+})
+</script>
+
+//pages/contact-us.vue
+<template>
+  <div>
+    contact page
+  </div>
+</template>
+
+<script setup lang="ts">
+definePageMeta({
+  middleware: ["auth"] //this middleware will apply on this contact-us page only
+  
+})
+</script>
+
+<style>
+
+</style>
+
+
+b. For applying middlware to all pages
+create middleware/auth.global.ts
+//auth.global.ts
+export default defineNuxtRouteMiddleware((to, from) => {
+
+    if (to.params.id === '1') {
+        return abortNavigation()
+      }
+
+    console.log({from,to})
+
+})
+
+now this middleware will automatically applied to all routes/pages
+
+Middleware Order
+->Middleware runs in the following order:
+1.Global Middleware
+2.Page defined middleware order (if there are multiple middleware declared with the array syntax)
+
+.ie. paila global middlware run hunxa then only page ma define vako run hunxa
+
+
+
+10. modules directory
+->Use the modules/ directory to automatically register local modules within your application
+->The auto-registered files patterns are:
+modules/*/index.ts
+modules/*.ts
+
+->You don't need to add those local modules to your nuxt.config.ts separately.
+
+but if we install thrid party modules, then we need to register on nuxt.config.ts
+suppose we install module from https://content.nuxt.com/get-started/installation
+to use this module,we need to register in nuxt.config.ts
+export default defineNuxtConfig({
+  modules: [
+    '@nuxt/content'
+  ],
+  
+})
+
+npx nuxi@latest module add pinia   then we need to add
+ modules: [
+    // ...
+    '@pinia/nuxt',
+  ],
+
+
+11.State Management : https://nuxt.com/docs/getting-started/state-management
+->Nuxt provides the useState composable to create a reactive and SSR-friendly shared state across components.
+->useState is an SSR-friendly "ref" replacement. Its value will be preserved after server-side rendering (during client-side hydration) and shared across all components using a unique key.
+
+so reactive property define garna "ref" vanda useState() use garne
+
+const counter = useState('counter', () => 0)//defining counter reactive property
+
+Example:
+<template>
+  <div>
+    <button @click="increment">Increment</button>
+    <p>Counter: {{ counter }}</p>
+  </div>
+</template>
+
+<script setup>
+import { useState } from '#app' // Importing useState from Nuxt
+
+// Using useState to create a reactive state
+const counter = useState('counter', () => 0)
+
+// Method to increment the counter
+const increment = () => {
+  counter.value++
+}
+</script>
+
+Now: statemanagement ko lagi either vuex or pinia use garna sakinxa, but nuxt recrommend to use useState()
+
+We have code in pinia
+export const useCounterStore = defineStore('counter', {
+  state: () => ({
+    counter: 0,
+    name:"bikash",
+    skills:['php','laravel']
+  }),
+  actions: {
+    increment() {
+      this.counter++
+    }
+  }
+})
+
+using useState()
+
+<!-- ExampleComponent.vue -->
+<template>
+  <div>
+    <p>Counter: {{ counter }}</p>
+    <p>Name: {{ name }}</p>
+    <p>Skills: {{ skills.join(', ') }}</p>
+    <button @click="increment">Increment</button>
+  </div>
+</template>
+
+<script setup>
+import { useState } from '#app'
+
+// Define each state property using useState
+const counter = useState('counter', () => 0)
+const name = useState('name', () => 'bikash')
+const skills = useState('skills', () => ['php', 'laravel'])
+
+// Actions can be simple functions or methods defined in the script setup
+const increment = () => {
+  counter.value++
+}
+</script>
+
+NOTE: complex and big application ma use pinia, for small projects useState() is better
+
+
+11. Pinia
+->pinia is a store library for Vue, 
+->it allows you to share a state across components/pages. 
+->If you are familiar with the Composition API, you might be thinking you can already share a global state with a simple export const state = reactive({}). 
+
+$ npx nuxi@latest module add pinia
+
+We supply a module to handle everything for you, you only need to add it to modules in your nuxt.config.js file:
+
+
+// nuxt.config.js
+export default defineNuxtConfig({
+  // ... other options
+  modules: [
+    // ...
+    '@pinia/nuxt',
+  ],
+})
+
+What is a Store?
+->A Store (like Pinia) is an entity holding state and business logic that isn't bound to your Component tree. 
+->In other words, it hosts global state.
+->It has three concepts, the state, getters and actions
+
+you can think
+a. state as data() property
+b. getters as computed() property
+c. actions as method()
+
+create stores/useCounterStore.ts
+export const useCounterStore = defineStore('counter', {
+  state: () => ({ count: 0, name: 'Eduardo' }),
+  getters: {
+    doubleCount: (state) => state.count * 2,
+  },
+  actions: {
+    increment() {
+      this.count++
+    },
+  },
+})
+
+In Setup Stores:
+
+ref()s become state properties
+computed()s become getters
+function()s become actions
+

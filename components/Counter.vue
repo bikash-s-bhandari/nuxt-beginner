@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts" setup>
-const { count, increment, decrement } = useCounter();
+const { count, increment, decrement } = useCounter();// form useCounter() composables
 </script>
 
 <style>
