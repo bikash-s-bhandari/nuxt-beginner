@@ -7,6 +7,10 @@
 definePageMeta({
   layout: "custom",
 });
+useHead({
+  title: 'About Page',
+
+})
 </script>
 
 <style></style>

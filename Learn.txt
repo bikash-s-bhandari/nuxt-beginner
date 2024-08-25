@@ -811,3 +811,151 @@ b. fetch/xhr ko side ma Doc lai click garne
 p. Check the document Request: page refresh garda tyo page ko url hit hunxa and response ma herne
 ->If you see fully rendered HTML in the response, it indicates that the server provided a pre-rendered page. This means it could be SSR or SSG.
 
+
+
+15. usefetch()  : https://nuxt.com/docs/api/composables/use-fetch
+->useFetch is a composable meant to be called directly in a setup function, plugin, or route middleware. It returns reactive composables and handles adding responses to the Nuxt payload so they can be passed from server to client without re-fetching the data on client side when the page hydrates.
+
+Usage:
+const { data, status, error, refresh, clear } = await useFetch('/api/modules', {
+  pick: ['title']
+})
+
+console.log(data.value)
+
+Using the query option, you can add search parameters to your query.
+
+const param1 = ref('value1')
+const { data, status, error, refresh } = await useFetch('/api/modules', {
+  query: { param1, param2: 'value2' }
+})
+
+The above example results in https://api.nuxt.com/modules?param1=value1&param2=value2.
+
+
+
+16. SEO and Meta
+->Out-of-the-box, Nuxt provides sensible defaults, which you can override if needed.
+
+export default defineNuxtConfig({
+  app: {
+    head: {
+      charset: 'utf-8',
+      viewport: 'width=device-width, initial-scale=1',
+      title:'My Nuxt App'
+    }
+  },
+})
+
+a.useHead
+->The useHead composable function allows you to manage your head tags programmatically and reactively,
+
+//app.vue
+<script setup lang="ts">
+useHead({
+  title: 'My App',
+  meta: [
+    { name: 'description', content: 'My amazing site.' }
+  ],
+  bodyAttrs: {
+    class: 'test'
+  },
+  script: [ { innerHTML: 'console.log(\'Hello world\')' } ]
+})
+</script>
+
+Components
+->Nuxt provides <Title>, <Base>, <NoScript>, <Style>, <Meta>, <Link>, <Body>, <Html> and <Head> components so that you can interact directly with your metadata within your component's template.
+
+//pages/posts/index.vue
+  <Head> //head section ma halxa
+    <Title>Blog List</Title>
+    <Meta name="description" content="this is blog list" />
+  </Head>
+
+
+  17.Hooks
+  ->hooks provide a powerful way to interact with the Nuxt lifecycle and extend its functionality. They allow you to execute custom logic at various stages of the build, server, and runtime processes.
+
+
+  1. Server-Side Hooks
+  ->Server-side hooks allow you to run code on the server side during specific parts of the Nuxt lifecycle. Here are a few examples:
+
+  "nitro:build:before": This hook runs before the Nitro build process starts. It can be useful for modifying the Nitro configuration or setting up custom build tasks.
+
+  export default defineNuxtConfig({
+  hooks: {
+    'nitro:build:before'(nitro) {
+      // Custom logic before Nitro build
+      console.log('Before Nitro build');
+    }
+  }
+});
+
+
+18. Nuxt Configuration
+->The "nuxt.config.ts" file is located at the root of a Nuxt project and can override or extend the application's behavior.
+
+export default defineNuxtConfig({
+  // My Nuxt config
+})
+
+Environment Variables and Private Tokens
+
+->The runtimeConfig API exposes values like environment variables to the rest of your application. By default, these keys are only available server-side. 
+->The keys within runtimeConfig.public are also available client-side.
+
+export default defineNuxtConfig({
+  runtimeConfig: {
+    // The private keys which are only available server-side .ie server folder vitra 
+    apiSecret: '123',
+    // Keys within public are also exposed client-side
+    public: {
+      apiBase: '/api'
+    }
+  }
+})
+
+->These variables are exposed to the rest of your application using the useRuntimeConfig() composable.
+<script setup lang="ts">
+const runtimeConfig = useRuntimeConfig()
+</script>
+
+a. Server-Side Access: (server folder vitra run hune files haru like apis, middlware etc)
+->To access the apiSecret on the server side, you can use the useRuntimeConfig() function within server-side contexts such as API routes, plugins, or middleware.
+
+eg.server/api/auth.ts
+export default defineEventHandler((event) => {
+  const config = useRuntimeConfig();
+  
+  // Access the private apiSecret key (server-side only)
+  const secret = config.apiSecret;
+  console.log({secret}) //server side access
+  
+  // Do something with the secret, like making a server-side API call
+  return {
+    message: `Server-side secret: ${secret}`
+  };
+});
+
+b. Client-Side Access: (server folder bahek harek pages vue files haru ma access)
+
+//app.vue
+
+<template>
+  <div>
+    <p>API Base URL: {{ apiBase }}</p>
+  </div>
+</template>
+
+<script setup>
+
+
+// Access public configuration
+const config = useRuntimeConfig();
+const apiBase = config.public.apiBase;
+
+// Use apiBase for making client-side API calls or displaying information
+</script>
+
+NOTE: server side ma console gareko browser ma show hudena, u can see in terminal

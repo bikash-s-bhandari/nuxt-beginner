@@ -1,4 +1,10 @@
 export default defineEventHandler(async (event) => {
+  const config = useRuntimeConfig();
+  
+  // Access the private apiSecret key (server-side only)
+  const secret = config.apiSecret;
+
+  console.log({secret})
   return [
     {
       id: 1,
